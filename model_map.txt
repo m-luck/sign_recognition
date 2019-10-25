@@ -1,0 +1,2 @@
+deeper = p main.py --epochs 511 --lr 0.005 --momentum 0.8, 5ish layers from 500 and backing off
+first_model_512 = default 512
