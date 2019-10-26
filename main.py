@@ -44,12 +44,12 @@ val_loader = torch.utils.data.DataLoader(
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
 model = Net()
-
+above_thres = False
 
 def train(epoch):
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-    if epoch > 8:
+    if above_thres:
         optimizer = optim.SGD(model.parameters(), lr=0.0005, momentum=0.9)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
@@ -78,6 +78,8 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
+    if validation_loss > 80:
+        above_thres = True
 
 
 for epoch in range(1, args.epochs + 1):
