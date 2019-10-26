@@ -50,7 +50,7 @@ def train(epoch):
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
     if above_thres:
-        optimizer = optim.SGD(model.parameters(), lr=0.0005, momentum=0.9)
+        optimizer = optim.SGD(model.parameters(), lr=0.00025, momentum=0.9)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
