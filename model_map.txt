@@ -4,3 +4,5 @@ epoch 33 is 94
 59 is 95
 66 is 95
 82 is 95
+
+epoch 236 of sub3

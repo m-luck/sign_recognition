@@ -24,6 +24,8 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
+print("lr",args.lr)
+print("momentum",args.momentum)
 
 torch.manual_seed(args.seed)
 
@@ -78,7 +80,7 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    if validation_loss > 80:
+    if validation_loss > 89:
         above_thres = True
 
 
