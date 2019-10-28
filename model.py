@@ -5,27 +5,36 @@ import torch.nn.functional as F
 nclasses = 43 # GTSRB as 43 classes
 
 class Net(nn.Module):
+
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3)
-        self.conv2 = nn.Conv2d(64, 64, kernel_size=3)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
-        self.conv4 = nn.Conv2d(64, 64, kernel_size=3)
-        self.conv_bn = nn.BatchNorm2d(64)
-        self.conv_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(256, 64)
-        self.fc2 = nn.Linear(64, 50)
-        self.finallayer = nn.Linear(50, nclasses)
+        self.conv1_1 = nn.Conv2d(1, 64, 5)
+        self.conv2_1 = nn.Conv2d(64, 64, 3)
+        self.conv2_2 = nn.Conv2d(64, 64, 3)
+        self.conv2_3 = nn.Conv2d(64, 64, 3)
+        self.fc1 = nn.Linear(64*7*7 + 64*5*5, 64)
+        self.fc2 = nn.Linear(64, nclasses)
+
+        print(""" \
+            self.conv1_1 = nn.Conv2d(1, 64, 5)
+            self.conv2_1 = nn.Conv2d(64, 64, 3)
+            self.conv2_2 = nn.Conv2d(64, 64, 3)
+            self.conv2_3 = nn.Conv2d(64, 64, 3)
+            self.fc1 = nn.Linear(64*5*5 + 64*1*1, 64)
+            self.fc2 = nn.Linear(64, nclasses)
+              """)
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv_drop(self.conv1(x)), 2))
-        x = F.relu(F.max_pool2d(self.conv_drop(self.conv2(x)), 2))
-        x = F.relu(self.conv_bn(self.conv3(x)))
-        x = F.relu(self.conv_bn(self.conv4(x)))
-        x = x.view(-1, 256)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training, p=0.2)
-        x = F.relu(self.fc2(x))
-        x = F.dropout(x, training=self.training, p=0.2)
-        x = self.finallayer(x)
-        return F.log_softmax(x)
+        x1 = F.max_pool2d(F.relu(self.conv1_1(x)), 4)
+        x2 = F.max_pool2d(F.relu(self.conv2_1(x1)), 3)
+        x2 = F.relu(self.conv2_2(x1))
+        x2 = F.relu(self.conv2_3(x1))
+        # print(x1.size())
+        # print(x2.size())
+        x1 = x1.view(-1, 64*7*7)
+        x2 = x2.view(-1, 64*5*5)
+        out = [x1, x2]
+        out = torch.cat(out, 1)
+        out = F.relu(self.fc1(out))
+        out = F.relu(self.fc2(out))
+        return F.log_softmax(out, dim=1)

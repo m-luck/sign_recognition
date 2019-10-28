@@ -80,8 +80,10 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    if validation_loss > 89:
+    if validation_loss > 60:
         above_thres = True
+    else:
+        above_thres = False
 
 
 for epoch in range(1, args.epochs + 1):

@@ -10,8 +10,9 @@ import torchvision.transforms as transforms
 # the training set
 data_transforms = transforms.Compose([
     transforms.Resize((32, 32)),
+    transforms.Grayscale(),
     transforms.ToTensor(),
-    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+    transforms.Normalize((0.5,),(0.5,))
 ])
 
 
