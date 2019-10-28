@@ -19,7 +19,7 @@ class Net(nn.Module):
         self.finallayer = nn.Linear(50, nclasses)
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv_drop(self.conv1(x)), 3))
+        x = F.relu(F.max_pool2d(self.conv_drop(self.conv1(x)), 2))
         x = F.relu(F.max_pool2d(self.conv_drop(self.conv2(x)), 2))
         x = F.relu(self.conv_bn(self.conv3(x)))
         x = F.relu(self.conv_bn(self.conv4(x)))

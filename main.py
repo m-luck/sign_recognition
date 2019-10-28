@@ -50,14 +50,16 @@ above_thres = False
 
 def train(epoch):
     model.train()
-    optimizer = optim.adam(model.parameters(), lr=args.lr, momentum=args.momentum)
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    # optimizer = optim.Adam(model.parameters(), lr=args.lr)
     if above_thres:
-        optimizer = optim.adam(model.parameters(), lr=0.00025, momentum=0.9)
+        optimizer = optim.SGD(model.parameters(), lr=0.00025, momentum=0.9)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        # loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
@@ -72,7 +74,8 @@ def validation():
     for data, target in val_loader:
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
-        validation_loss += F.nll_loss(output, target, size_average=False).data.item() # sum up batch loss
+        # validation_loss += F.nll_loss(output, target, size_average=False).data.item() # sum up batch loss
+        validation_loss += F.cross_entropy(output, target, size_average=False).data.item() # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 

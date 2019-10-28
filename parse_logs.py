@@ -7,6 +7,7 @@ def parse(filename):
     training_avg_loss = 0
     training_avg_plot = []
     val_plot = []
+    val_acc = []
     with open(filename, "r") as f:
         for line in f:
             if is_training_line(line):
@@ -15,10 +16,11 @@ def parse(filename):
             if is_val_line(line):
                 training_avg_plot.append(training_avg_loss)
                 val_plot.append(get_val_loss(line))
+                val_acc.append(get_val_acc(line))
                 training_avg_loss = 0
                 training_count = 0
         print(training_avg_plot, val_plot)
-        return training_avg_plot, val_plot
+        return training_avg_plot, val_plot, val_acc
                 
             
             
@@ -39,9 +41,20 @@ def get_training_loss(line):
 def get_val_loss(line):
     return float(line.split("loss: ")[1].split(",")[0])
 
-train, val = parse(sys.argv[1])
+def get_val_acc(line):
+    return float(line.split("(")[1].split("%")[0])
 
-plt.plot(train)
-plt.plot(val)
+train, val, val_acc = parse(sys.argv[1])
+
+# tr, = plt.plot(train, label="train")
+# va, = plt.plot(val, label="val")
+# plt.legend(handles=[tr, va])
+# plt.xlabel("epoch")
+# plt.ylabel("loss")
+
+vac, = plt.plot(val_acc, label="val acc")
+plt.legend(handles=[vac])
+plt.xlabel("epoch")
+plt.ylabel("percentage acc")
 
 plt.show()
