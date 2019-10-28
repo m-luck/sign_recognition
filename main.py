@@ -50,9 +50,9 @@ above_thres = False
 
 def train(epoch):
     model.train()
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    optimizer = optim.adam(model.parameters(), lr=args.lr, momentum=args.momentum)
     if above_thres:
-        optimizer = optim.SGD(model.parameters(), lr=0.00025, momentum=0.9)
+        optimizer = optim.adam(model.parameters(), lr=0.00025, momentum=0.9)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
@@ -80,7 +80,7 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    if validation_loss > 60:
+    if validation_loss > 90:
         above_thres = True
     else:
         above_thres = False

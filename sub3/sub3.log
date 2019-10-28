@@ -7,7 +7,7 @@ Train Epoch: 1 [1920/35339 (5%)]	Loss: 3.726562
 Train Epoch: 1 [2560/35339 (7%)]	Loss: 3.726721
 Train Epoch: 1 [3200/35339 (9%)]	Loss: 3.724851
 Train Epoch: 1 [3840/35339 (11%)]	Loss: 3.718852
-Train Epoch: 1 [4480/35339 (13%)]	Loss: 3.689645
+Train Epoch: 1 [4i480/35339 (13%)]	Loss: 3.689645
 Train Epoch: 1 [5120/35339 (14%)]	Loss: 3.607144
 Train Epoch: 1 [5760/35339 (16%)]	Loss: 3.531229
 Train Epoch: 1 [6400/35339 (18%)]	Loss: 3.643383

@@ -2,26 +2,31 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-nclasses = 43 # GTSRB as 43 classes
+nclasses = 43 
 
 class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 108, 3)
-        self.conv2 = nn.Conv2d(108, 200, 3)
-        self.fc1 = nn.Linear(15 * 15 * 108 + 6 * 6 * 200, 100)
-        self.fc2 = nn.Linear(100, nclasses)
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3)
+        self.conv2 = nn.Conv2d(64, 64, kernel_size=3)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
+        self.conv4 = nn.Conv2d(64, 64, kernel_size=3)
+        self.conv_bn = nn.BatchNorm2d(64)
+        self.conv_drop = nn.Dropout2d()
+        self.fc1 = nn.Linear(256, 64)
+        self.fc2 = nn.Linear(64, 50)
+        self.finallayer = nn.Linear(50, nclasses)
 
     def forward(self, x):
-        x1 = F.max_pool2d(F.relu(self.conv1(x)), 2)
-        x2 = F.max_pool2d(F.relu(self.conv2(x1)), 2)
-        # print(x1.size())
-        # print(x2.size())
-        x1 = x1.view(-1, 108*15*15)
-        x2 = x2.view(-1, 200*6*6)
-        out = [x1, x2]
-        out = torch.cat(out, 1)
-        out = F.relu(self.fc1(out))
-        out = F.relu(self.fc2(out))
-        return F.log_softmax(out, dim=1)
+        x = F.relu(F.max_pool2d(self.conv_drop(self.conv1(x)), 3))
+        x = F.relu(F.max_pool2d(self.conv_drop(self.conv2(x)), 2))
+        x = F.relu(self.conv_bn(self.conv3(x)))
+        x = F.relu(self.conv_bn(self.conv4(x)))
+        x = x.view(-1, 256)
+        x = F.relu(self.fc1(x))
+        x = F.dropout(x, training=self.training, p=0.2)
+        x = F.relu(self.fc2(x))
+        x = F.dropout(x, training=self.training, p=0.2)
+        x = self.finallayer(x)
+        return F.log_softmax(x)
