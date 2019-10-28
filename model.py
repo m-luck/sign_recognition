@@ -8,9 +8,9 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3)
-        self.conv2 = nn.Conv2d(64, 64, kernel_size=3)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
+        self.conv1 = nn.Conv2d(1, 128, kernel_size=3)
+        self.conv2 = nn.Conv2d(128, 128, kernel_size=3)
+        self.conv3 = nn.Conv2d(128, 64, kernel_size=3)
         self.conv4 = nn.Conv2d(64, 64, kernel_size=3)
         self.conv_bn = nn.BatchNorm2d(64)
         self.conv_drop = nn.Dropout2d()
