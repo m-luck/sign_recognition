@@ -53,7 +53,7 @@ def train(epoch):
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
     # optimizer = optim.Adam(model.parameters(), lr=args.lr)
     if above_thres:
-        optimizer = optim.SGD(model.parameters(), lr=0.00025, momentum=0.3)
+        optimizer = optim.SGD(model.parameters(), lr=0.0025, momentum=0.5)
         # optimizer = optim.Adam(model.parameters(), lr=0.00025)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
@@ -84,7 +84,7 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    if validation_loss > 90:
+    if validation_loss > 70:
         above_thres = True
     else:
         above_thres = False

@@ -15,8 +15,7 @@ class Net(nn.Module):
         self.conv_bn = nn.BatchNorm2d(64)
         self.conv_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(256, 64)
-        self.fc2 = nn.Linear(64, 50)
-        self.finallayer = nn.Linear(50, nclasses)
+        self.finallayer = nn.Linear(64, nclasses)
 
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv_drop(self.conv1(x)), 2))
@@ -25,8 +24,6 @@ class Net(nn.Module):
         x = F.relu(self.conv_bn(self.conv4(x)))
         x = x.view(-1, 256)
         x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training, p=0.2)
-        x = F.relu(self.fc2(x))
-        x = F.dropout(x, training=self.training, p=0.2)
+        x = F.dropout(x, training=self.training, p=0.25)
         x = self.finallayer(x)
         return F.log_softmax(x)
