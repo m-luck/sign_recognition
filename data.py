@@ -11,21 +11,23 @@ import torchvision.transforms as transforms
 # the training set
 data_transforms = transforms.Compose([
     transforms.Resize((32, 32)),
-    transforms.Grayscale(),
-    transforms.RandomApply([
-        transforms.RandomRotation(45, resample=PIL.Image.BICUBIC),
-        transforms.RandomAffine(0, translate=(0.1, 0.1),
-                                resample=PIL.Image.BICUBIC),
-        transforms.RandomAffine(0, scale=(0.9, 1.1), 
-                                resample=PIL.Image.BICUBIC)
-        transforms.RandomAffine(0, shear=10, 
-                                resample=PIL.Image.BICUBIC)
-    ]),
+    # transforms.Grayscale(),
     transforms.ToTensor(),
-    # transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
-    transforms.Normalize((0.5, ), ( 0.5,))
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+    # transforms.Normalize((0.5, ), ( 0.5,))
 ])
 
+def spec_trans(specific_transform):
+    trans = transforms.Compose([
+        specific_transform,
+        transforms.Resize((32, 32)),
+        # transforms.Grayscale(),
+        transforms.ToTensor(),
+        # transforms.Normalize((0.5, ), ( 0.5,))
+        transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+    ])
+    return trans
+    
 
 def initialize_data(folder):
     # train_zip = folder + '/train_images.zip'
@@ -55,8 +57,10 @@ def initialize_data(folder):
         os.mkdir(val_folder)
         for dirs in os.listdir(train_folder):
             if dirs.startswith('000'):
+                print('---',dirs)
                 os.mkdir(val_folder + '/' + dirs)
                 for f in os.listdir(train_folder + '/' + dirs):
+                    print(f)
                     if f.startswith('00000') or f.startswith('00001') or f.startswith('00002'):
                         # move file to validation folder
                         os.rename(train_folder + '/' + dirs + '/' + f, val_folder + '/' + dirs + '/' + f)

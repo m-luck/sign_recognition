@@ -17,7 +17,7 @@ parser.add_argument('--data', type=str, default='data', metavar='D',
                     help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
 parser.add_argument('--model', type=str, metavar='M',
                     help="the model file to be evaluated. Usually it is of the form model_X.pth")
-parser.add_argument('--outfile', type=str, default='gtsrb_kaggle.csv', metavar='D',
+parser.add_argument('--outfile', type=str, default='gtsrb_kagglea.csv', metavar='D',
                     help="name of the output csv file")
 
 args = parser.parse_args()

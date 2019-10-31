@@ -52,7 +52,7 @@ train, val, val_acc = parse(sys.argv[1])
 # plt.xlabel("epoch")
 # plt.ylabel("loss")
 
-vac, = plt.plot(val_acc, label="val acc")
+vac, = plt.pl(val_acc, label="val acc")
 plt.legend(handles=[vac])
 plt.xlabel("epoch")
 plt.ylabel("percentage acc")

@@ -30,13 +30,30 @@ print("momentum",args.momentum)
 torch.manual_seed(args.seed)
 
 ### Data Initialization and Loading
-from data import initialize_data, data_transforms # data.py in the same folder
+from data import initialize_data, spec_trans # data.py in the same folder
+from data import data_transforms
 initialize_data(args.data) # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/train_images',
-                         transform=data_transforms),
+    torch.utils.data.ConcatDataset([
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.CenterCrop(32))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(brightness=0.9))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(contrast=0.9))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(hue=0.5))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(90))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, translate=((0.40,0.40))))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, shear=10))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomHorizontalFlip(p=1.0))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomVerticalFlip(p=1.0))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomErasing(p=1.0))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomPerspective()))
+    ]),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
+
+# train_loader = torch.utils.data.DataLoader(
+#     datasets.ImageFolder(args.data + '/train_images',
+#                          transform=data_transforms),
+#     batch_size=args.batch_size, shuffle=True, num_workers=1)
 val_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(args.data + '/val_images',
                          transform=data_transforms),
@@ -46,27 +63,29 @@ val_loader = torch.utils.data.DataLoader(
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
 model = Net()
+# model = torch.hub.load('pytorch/vision', 'mobilenet_v2', pretrained=False)
 above_thres = False
+optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
 def train(epoch):
     model.train()
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-    # optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    if above_thres:
-        optimizer = optim.SGD(model.parameters(), lr=0.0025, momentum=0.5)
-        # optimizer = optim.Adam(model.parameters(), lr=0.00025)
+    # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    # if above_thres:
+    #     # optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.7)
+    #     optimizer = optim.Adam(model.parameters(), lr=0.00025)
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model(data)
-        # loss = F.nll_loss(output, target)
-        loss = F.cross_entropy(output, target)
+        # loss = F.cross_entropy(output, target)
+        loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.data.item()))
+    print(target)
 
 def validation():
     model.eval()
@@ -75,8 +94,8 @@ def validation():
     for data, target in val_loader:
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
-        # validation_loss += F.nll_loss(output, target, size_average=False).data.item() # sum up batch loss
-        validation_loss += F.cross_entropy(output, target, size_average=False).data.item() # sum up batch loss
+        validation_loss += F.nll_loss(output, target, size_average=False).data.item() # sum up batch loss
+        # validation_loss += F.cross_entropy(output, target, size_average=False).data.item() # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
@@ -84,10 +103,10 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    if validation_loss > 70:
-        above_thres = True
-    else:
-        above_thres = False
+    # if validation_loss > 90:
+    #     above_thres = False
+    # else:
+    #     above_thres = False
 
 
 for epoch in range(1, args.epochs + 1):
