@@ -27,7 +27,36 @@ def spec_trans(specific_transform):
         transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
     ])
     return trans
-    
+
+def spec_trans_end(specific_transform):
+    trans = transforms.Compose([
+        transforms.Resize((32, 32)),
+        # transforms.Grayscale(),
+        transforms.ToTensor(),
+        # transforms.Normalize((0.5, ), ( 0.5,))
+        transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629)),
+        specific_transform
+    ])
+    return trans    
+
+randoTrans = transforms.Compose([
+    transforms.RandomApply(
+        [
+            transforms.ColorJitter(brightness=0.6),
+            transforms.ColorJitter(contrast=0.7),
+            transforms.ColorJitter(hue=0.5),
+            transforms.RandomAffine(90),
+            transforms.RandomAffine(0, translate=((0.40,0.40))),
+            transforms.RandomAffine(0, shear=10),
+            transforms.RandomHorizontalFlip(p=1.0),
+            transforms.RandomVerticalFlip(p=1.0)
+        ]
+        ,p=0.3),
+        transforms.Resize((32, 32)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629)),
+        transforms.RandomErasing(p=0.9, value='random')
+])
 
 def initialize_data(folder):
     # train_zip = folder + '/train_images.zip'

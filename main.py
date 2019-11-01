@@ -30,25 +30,26 @@ print("momentum",args.momentum)
 torch.manual_seed(args.seed)
 
 ### Data Initialization and Loading
-from data import initialize_data, spec_trans # data.py in the same folder
+from data import initialize_data, spec_trans, spec_trans_end, randoTrans # data.py in the same folder
 from data import data_transforms
 initialize_data(args.data) # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
     torch.utils.data.ConcatDataset([
         datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.CenterCrop(32))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(brightness=0.9))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(contrast=0.9))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(brightness=0.5))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(contrast=0.7))),
         datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.ColorJitter(hue=0.5))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(90))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, translate=((0.40,0.40))))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, shear=10))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomHorizontalFlip(p=1.0))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomVerticalFlip(p=1.0))),
-        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomErasing(p=1.0))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(80))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, translate=((0.10,0.10))))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomAffine(0, scale=(1.0, 1.24), shear=13))),
+        # datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomHorizontalFlip(p=1.0))),
+        # datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomVerticalFlip(p=1.0))),
+        datasets.ImageFolder(args.data + "/train_images", transform=spec_trans_end(transforms.RandomErasing(p=1.0, value='random'))),
+        datasets.ImageFolder(args.data + "/train_images", transform=randoTrans),
         datasets.ImageFolder(args.data + "/train_images", transform=spec_trans(transforms.RandomPerspective()))
     ]),
-    batch_size=args.batch_size, shuffle=True, num_workers=1)
+    batch_size=args.batch_size, shuffle=True, num_workers=4)
 
 # train_loader = torch.utils.data.DataLoader(
 #     datasets.ImageFolder(args.data + '/train_images',

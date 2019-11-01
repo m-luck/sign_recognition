@@ -46,15 +46,15 @@ def get_val_acc(line):
 
 train, val, val_acc = parse(sys.argv[1])
 
-# tr, = plt.plot(train, label="train")
-# va, = plt.plot(val, label="val")
-# plt.legend(handles=[tr, va])
-# plt.xlabel("epoch")
-# plt.ylabel("loss")
-
-vac, = plt.pl(val_acc, label="val acc")
-plt.legend(handles=[vac])
+tr, = plt.plot(train, label="train")
+va, = plt.plot(val, label="val")
+plt.legend(handles=[tr, va])
 plt.xlabel("epoch")
-plt.ylabel("percentage acc")
+plt.ylabel("loss")
+
+# vac, = plt.plot(val_acc, label="val acc")
+# plt.legend(handles=[vac])
+# plt.xlabel("epoch")
+# plt.ylabel("percentage acc")
 
 plt.show()
